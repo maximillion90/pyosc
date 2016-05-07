@@ -291,9 +291,14 @@ class OSCMessage(object):
 		elif typehint == 't':
 			binary = OSCTimeTag(argument)
 			tag = 't'
+		elif typehint == 'B':
+			binary = ''
+			if argument:
+				tag = 'T'
+			else:
+				tag = 'F'
 		else:
 			tag, binary = OSCArgument(argument, typehint)
-
 		self.typetags += tag
 		self.message += binary
 		

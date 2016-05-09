@@ -824,6 +824,15 @@ def _readString(data):
 	nextData = int(math.ceil((length+1) / 4.0) * 4)
 	return (data[0:length], data[nextData:])
 
+def _readBoolean(data):
+	"""Tries to verify boolean value"""
+	# data can't have anything in it if its a boolean
+	if len(data) > 0:
+		print 'To Many Data Bits for a Boolean Value'
+	else:
+		# just return nothing
+		return "", ""
+
 def _readBlob(data):
 	"""Reads the next (numbered) block of data
 	"""
@@ -901,7 +910,9 @@ def _readDouble(data):
 def decodeOSC(data):
 	"""Converts a binary OSC message to a Python list. 
 	"""
-	table = {"i":_readInt, "f":_readFloat, "s":_readString, "b":_readBlob, "d":_readDouble, "t":_readTimeTag}
+	table = {"i":_readInt, "f":_readFloat, "s":_readString, 
+			 "b":_readBlob, "d":_readDouble, "t":_readTimeTag,
+			 "T":_readBoolean, "F":_readBoolean}
 	decoded = []
 	address,  rest = _readString(data)
 	if address.startswith(","):

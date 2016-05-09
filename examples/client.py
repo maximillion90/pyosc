@@ -1,9 +1,26 @@
-from OSC import OSCClient, OSCMessage
+from OSC import *
+from time import sleep
+import threading
+
+
+server = OSCServer( ("192.168.20.33", 63535) )
+
+def debug_handler(addr, tags, data, source):
+	print addr
+	print tags
+	print data
+	print source
 
 client = OSCClient()
-client.connect( ("localhost", 7110) )
+client.setServer(server)
+client.connect( ("192.168.40.1", 7770) )
+# client.setServer(server)
+
+server.addMsgHandler( "/info/model", debug_handler )
+st = threading.Thread(target=server.serve_forever)
+st.start()
 
 boolean = OSCMessage()
-boolean.setAddress('/in/phantom')
-boolean.append(True, typehint='B')
+boolean.setAddress('/info/info')
+# boolean.append(False)
 client.send(boolean)

@@ -171,6 +171,9 @@ FloatTypes = [types.FloatType]
 global IntTypes
 IntTypes = [types.IntType]
 
+global BoolTypes
+BoolTypes = [types.BooleanType]
+
 global NTP_epoch
 from calendar import timegm
 NTP_epoch = timegm((1900,1,1,0,0,0)) # NTP time started in 1 Jan 1900
@@ -291,12 +294,14 @@ class OSCMessage(object):
 		elif typehint == 't':
 			binary = OSCTimeTag(argument)
 			tag = 't'
-		elif typehint == 'B':
-			binary = ''
-			if argument:
-				tag = 'T'
-			else:
-				tag = 'F'
+		# for booleans we take only the empty
+		# binary from the def and trust the users tag
+		elif typehint == 'T':
+			binary = OSCBoolean(argument)[0]
+			tag = 'T'
+		elif typehint == 'F':
+			binary = OSCBoolean(arguement)[0]
+			tag = 'F'
 		else:
 			tag, binary = OSCArgument(argument, typehint)
 		self.typetags += tag
@@ -742,6 +747,9 @@ def OSCArgument(next, typehint=None):
 		elif type(next) in IntTypes:
 			binary  = struct.pack(">i", int(next))
 			tag = 'i'
+		elif type(next) in BoolTypes:
+			# return tag and an empty string
+			tag, binary = OSCBoolean(next)
 		else:
 			binary  = OSCString(next)
 			tag = 's'
@@ -786,6 +794,22 @@ def OSCTimeTag(time):
 		binary = struct.pack('>LL', 0L, 1L)
 
 	return binary
+
+def OSCBoolean(boolean_value):
+	""" Verifys you are trying to perform opperation on 
+	a boolean and returns the empty binary required along with correct tag"""
+	# binary is always empty so define immediately
+	binary = ''
+	if isinstance(boolean_value, bool):
+		if boolean_value == True:
+			tag = 'T'
+		elif boolean_value == False:
+			tag = 'F'
+	else:
+		raise OSCError('OSC was expecting and boolean and got a %s' %type(boolean_value))
+
+	return tag, binary
+
 
 ######
 #

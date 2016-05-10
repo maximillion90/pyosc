@@ -304,8 +304,12 @@ class OSCMessage(object):
 			tag = 'F'
 		else:
 			tag, binary = OSCArgument(argument, typehint)
+
 		self.typetags += tag
-		self.message += binary
+
+		if binary is not None:
+			self.message += binary
+
 		
 	def getBinary(self):
 		"""Returns the binary representation of the message
@@ -799,7 +803,7 @@ def OSCBoolean(boolean_value):
 	""" Verifys you are trying to perform opperation on 
 	a boolean and returns the empty binary required along with correct tag"""
 	# binary is always empty so define immediately
-	binary = ''
+	binary = None
 	if isinstance(boolean_value, bool):
 		if boolean_value == True:
 			tag = 'T'
@@ -831,7 +835,7 @@ def _readBoolean(data):
 		print 'To Many Data Bits for a Boolean Value'
 	else:
 		# just return nothing
-		return "", ""
+		return None, None
 
 def _readBlob(data):
 	"""Reads the next (numbered) block of data

@@ -328,7 +328,7 @@ class OSCMessage(object):
 	def __str__(self):
 		"""Returns the Message's address and contents as a string.
 		"""
-		return "%s %s" % (self.address, str(self.values()))
+		return "%s %s %s" % (self.address, self.tags(), str(self.values()))
 	
 	def __len__(self):
 		"""Returns the number of arguments appended so far
@@ -834,7 +834,6 @@ def _readBoolean(data):
 	if len(data) > 0:
 		print 'To Many Data Bits for a Boolean Value'
 	else:
-		# just return nothing
 		return None, None
 
 def _readBlob(data):
@@ -941,8 +940,13 @@ def decodeOSC(data):
 		decoded.append(typetags)
 		if typetags.startswith(","):
 			for tag in typetags[1:]:
-				value, rest = table[tag](rest)
-				decoded.append(value)
+				if tag == 'T':
+					decoded.append(True)
+				elif tag == 'F':
+					decoded.append(False)
+				else:
+					value, rest = table[tag](rest)
+					decoded.append(value)
 		else:
 			raise OSCError("OSCMessage's typetag-string lacks the magic ','")
 

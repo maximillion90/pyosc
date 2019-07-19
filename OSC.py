@@ -1354,7 +1354,9 @@ def getRegEx(pattern):
 	# Translate OSC-address syntax to python 're' syntax
 	pattern = pattern.replace(".", r"\.")		# first, escape all '.'s in the pattern.
 	pattern = pattern.replace("(", r"\(")		# escape all '('s.
-	pattern = pattern.replace(")", r"\)")		# escape all ')'s.
+	pattern = pattern.replace(")", r"\)")
+	pattern = pattern.replace("]", r"\]")
+	pattern = pattern.replace("[", r"\[")		# escape all ')'s.
 	pattern = pattern.replace("*", r".*")		# replace a '*' by '.*' (match 0 or more characters)
 	pattern = pattern.translate(OSCtrans)		# change '?' to '.' and '{,}' to '(|)'
 	
@@ -1739,9 +1741,9 @@ class OSCAddressSpace:
 		  - 'callback' is the function called for incoming OSCMessages that match 'address'.
 		The callback-function will be called with the same arguments as the 'msgPrinter_handler' below
 		"""
-		for chk in '*?,[]{}# ':
+		for chk in '*?,{}# ':
 			if chk in address:
-				raise OSCServerError("OSC-address string may not contain any characters in '*?,[]{}# '")
+				raise OSCServerError("OSC-address string may not contain any characters in '*?,{}# '")
 		
 		if type(callback) not in (types.FunctionType, types.MethodType):
 			raise OSCServerError("Message callback '%s' is not callable" % repr(callback))
@@ -1776,7 +1778,6 @@ class OSCAddressSpace:
 			raise OSCServerError("Malformed OSC-message; got %d typetags [%s] vs. %d values" % (len(tags), tags, len(data)))
 		
 		expr = getRegEx(pattern)
-		
 		replies = []
 		matched = 0
 		for addr in self.callbacks.keys():
